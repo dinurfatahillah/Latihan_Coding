@@ -1,0 +1,133 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cstdio>
+
+void printDataPegawai(const std::string fileName) {
+
+    std::ifstream file(fileName);
+    if(!file.is_open()) {
+        std::cout << "File Tidak Dapat Dibuka\n";
+        return;
+    }
+
+    std::string line;
+    bool kosong = false;
+    while(std::getline(file,line)) {
+        kosong = true;
+        std::cout << line << std::endl;
+    }
+
+    if(!kosong) {
+        std::cout << "File Ini Kosong\n";
+    }
+    file.close();
+}
+
+void tambahDataPegawai(const std::string fileName) {
+    std::string nama;
+    int gaji;
+
+    std::ofstream file(fileName, std::ios::app);
+    if(!file.is_open()) {
+        std::cout << "File Tidak Dapat Dibuat\n";
+        return;
+    }
+
+    std::cout << "Masukan Nama Pegawai : ";
+    std::cin.ignore();
+    std::getline(std::cin, nama);
+    std::cout << "Masukan Gaji Pegawai : ";
+    std::cin >> gaji;
+
+    file << "Nama : " << nama << "\n" << "Gaji : " << gaji << std::endl;
+    file << std::endl;
+
+    file.close();
+}
+
+void cariNamaPegawai(const std::string fileName) {
+    std::ifstream file(fileName);
+    if(!file.is_open()) {
+        std::cout << "File Tidak Dapat Dibuka\n";
+        return;
+    }
+    std::string cariNama;
+    std::string line;
+    bool ditemukan = false;
+
+    std::cout << "MasukanNama Pegawai Yang Akan Dicari : ";
+    std::cin.ignore();
+    std::getline(std::cin, cariNama);
+    while(std::getline(file, line)) {
+        if(line.find(cariNama) != std::string::npos) {
+            ditemukan = true;
+            std::cout << "Nama Ditemukan\n";
+            std::getline(file,line);
+            std::cout << line;
+
+        }
+    }
+}
+
+void editDataPegawai(const std::string fileName) {
+    std::string line, newName, cariNama;
+    int newGaji;
+    bool ditemukan = false;
+
+    std::ifstream file(fileName);
+    if(!file.is_open()) {
+        std::cout << "File Tidak Dapat Dibuka\n";
+        return;
+    }
+    std::ofstream file2("temp.txt");
+    if(!file2.is_open()) {
+        std::cout << "File Tidak Dapat Dibuka\n";
+        return;
+    }
+
+    while(std::getline(file,line)) {
+        file2 << line << std::endl;
+    }
+    int hasil = std::remove("dataPegawai.txt");
+    file.close();
+    file2.close();
+    if(hasil == 0){
+        std::cout << "File Berhasil Dihapus\n";
+    }else {
+        std::cout << "File gagal Dihapus\n";
+    }
+}
+
+int main() {
+    int pilih;
+    std::string line;
+    const std::string fileName = "DataPegawai.txt";
+
+    std::cout << "=================================\n";
+    std::cout << "SELAMAT ATANG DI APLIKASI PEGAWAI\n";
+    std::cout << "=================================\n";
+    do {
+        std::cout <<std::endl;
+        std::cout << "1] Tampilkan Seluruh Data Pegawai\n";
+        std::cout << "2] Tambah Data Pegawai\n";
+        std::cout << "3] Cari Pegawai Berdasrkan Nama\n";
+        std::cout << "4] Edit Data Pegawai\n";
+        std::cout << "5] Hapus data Pegawai\n";
+
+        std::cout << std::endl;
+        std::cout << "Pilih Nomor : ";
+        std::cin >> pilih;
+
+        if (pilih == 1) {
+            printDataPegawai(fileName);
+        } else if(pilih == 2) {
+            tambahDataPegawai(fileName);
+        } else if(pilih == 3) {
+            cariNamaPegawai(fileName);
+        } else if(pilih == 4) {
+            editDataPegawai(fileName);
+        }
+    } while(true);
+    return 0;
+}
