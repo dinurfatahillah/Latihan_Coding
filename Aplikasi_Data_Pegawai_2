@@ -1,199 +1,264 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstdio>
 
-void printData(const std::string fileName){
-    bool isiFile;
+void printDataPegawai(const std::string fileName) {
 
-    std::ifstream file (fileName);
-    if(!file.is_open()){
+    std::ifstream file(fileName);
+    if(!file.is_open()) {
         std::cout << "File Tidak Dapat Dibuka\n";
         return;
     }
 
     std::string line;
-    std::cout << std::endl;
-    while(std::getline(file, line)){
-        isiFile = true;
+    bool kosong = false;
+    while(std::getline(file,line)) {
+        kosong = true;
         std::cout << line << std::endl;
     }
-    if(!isiFile){
-        std::cout    << "File Ini Kosong !\n";
+
+    if(!kosong) {
+        std::cout << "Data File Kosong\n";
     }
     file.close();
 }
 
-void tambahDataPegawai(const std::string fileName){
+void tambahDataPegawai(const std::string fileName) {
     std::string nama;
-    std::string gaji;
+    int gaji;
 
     std::ofstream file(fileName, std::ios::app);
-    if(!file.is_open()){
-        std::cout << "File Gagal Dibuat\n";
+    if(!file.is_open()) {
+        std::cout << "File Tidak Dapat Dibuat\n";
         return;
     }
 
-    std::cout << "Nama Pegawai : ";
+    std::cout << "Masukan Nama Pegawai : ";
     std::getline(std::cin, nama);
-    std::cout << "Gaji Pegawai : ";
-    std::getline(std::cin, gaji);
+    std::cout << "Masukan Gaji Pegawai : ";
+    std::cin >> gaji;
 
-    file << "Nama : " << nama << "\n" << "Gaji : Rp " << gaji << "\n\n";
+    file << "Nama : " << nama << "\n" << "Gaji : " << gaji << std::endl;
+    file << std::endl;
 
     file.close();
 }
 
-void cariDataPegawai(const std::string fileName){
-    std::string cariNama;
-
+void cariNamaPegawai(const std::string fileName) {
     std::ifstream file(fileName);
-    if(!file.is_open()){
-        std::cout << "File Gagal Dibuka\n";
+    if(!file.is_open()) {
+        std::cout << "File Tidak Dapat Dibuka\n";
         return;
     }
-
+    std::string cariNama;
     std::string line;
     bool ditemukan = false;
 
-    std::cout << "Cari Nama Pegawai : ";
+    std::cout << "MasukanNama Pegawai Yang Akan Dicari : ";
+    std::cin.ignore();
     std::getline(std::cin, cariNama);
-    std::cout << std::endl;
-    while(std::getline(file, line)){
-        if(line.find(cariNama) != std::string::npos){
+    while(std::getline(file, line)) {
+        if(line.find(cariNama) != std::string::npos) {
             ditemukan = true;
-            std::cout << "Nama Ditemukan \n\n";
+            std::cout << "Nama Ditemukan\n";
             std::cout << line << std::endl;
-            std::string line2;
-            std::getline(file,line2);
-            std::cout << line2 << std::endl;
-            std::cout << std::endl;
+            std::getline (file, line);
+            std::cout << line << std::endl;
+
         }
     }
-    if(!ditemukan){
-        std::cout << "Nama Tidak Ditemukan \n";
+
+    if(!ditemukan) {
+        std::cout << "Data Pegawai Tidak Ditemukan!\n";
         return;
     }
 }
 
-void editDataPegawai(const std::string fileName, const std::string fileTemp){
-    std::string cariNama;
-    std::string newName;
-    std::string newGaji;
-    
+void editDataPegawai(const std::string fileName, const std::string fileTemp) {
+    std::string line, newName, cariNama;
+    int newGaji;
+
     std::ifstream file(fileName);
-    if (!file.is_open()){
-        std::cout << "Fili Gagal Dibuka\n";
+    if(!file.is_open()) {
+        std::cout << "File Tidak Dapat Dibuka\n";
+        return;
+    }
+    std::ofstream file2(fileTemp);
+    if(!file2.is_open()) {
+        std::cout << "File Tidak Dapat Dibuka\n";
         return;
     }
 
-    std::ofstream file2(fileTemp);
-    if(!file2.is_open()){
-        std::cout << "File Temp Gagal Dibuat\n";
-        return;
-    }
-    
-    std::string line;
-    while(std::getline(file,line)){
+    while(std::getline(file,line)) {
         file2 << line << std::endl;
     }
-
     file.close();
     file2.close();
     int hasil = std::remove(fileName.c_str());
-    if(hasil == 0){
-        std::ofstream fileBaru(fileName);
-        if(!fileBaru.is_open()){
-            std::cout << "File Baru Gagal Dibuat\n";
+    if(hasil == 0) {
+        std::ofstream fileBaru (fileName);
+        fileBaru.close();
+    } else {
+        std::cout << "File gagal Dihapus\n";
+        return;
+    }
+    std::ofstream filePegawai (fileName);
+    if(!filePegawai.is_open()) {
+        std::cout << "File Pegawai Tidak Dapat Dibuat";
+        return;
+    }
+    std::ifstream filetmp(fileTemp);
+    if(!filetmp.is_open()) {
+        std::cout << "File Temp Tidak Dapat Dibuka\n";
+        return;
+    }
+
+    std::cout << "Masukan Nama Pegawai Yang Akan di Edit :";
+    std::getline(std::cin, cariNama);
+    bool ditemukan = false;
+    while(std::getline(filetmp, line)) {
+        if(line.find(cariNama) != std::string::npos) {
+            ditemukan = true;
+            std::cout << "Edit Nama Pegawai : ";
+            std::getline(std::cin, newName);
+
+            std::string lineGaji;
+            std::getline(filetmp, lineGaji);
+            std::cout << "Edit Gaji Pegawai : ";
+            std::cin >> newGaji;
+
+            filePegawai << "Nama : " << newName << "\n" << "Gaji : " << newGaji << std::endl;
+        } else {
+            filePegawai << line << std::endl;
+        }
+    }
+    if(!ditemukan) {
+        std::cout << "Nama Tidak Ditemukan!\n";
+        return;
+    }
+
+}
+
+void hapusDataPegawai(const std::string fileName, const std::string fileTemp) {
+    std::string cariNama;
+    bool ditemukan = false;
+    std::string line;
+
+    std::ifstream file(fileName);
+    if(!file.is_open()) {
+        std::cout << "File Tidak Dapat Dibuka\n";
+        return;
+    }
+    std::ofstream file2(fileTemp);
+    if(!file2.is_open()) {
+        std::cout << "File Tidak Dapat Dibuat\n";
+        return;
+    }
+
+    std::cout << "Masukan nama Pegawai Yang Akan Dihapus : ";
+    std::getline(std::cin, cariNama);
+
+    while(std::getline(file, line)) {
+        if(line.find(cariNama) != std::string::npos) {
+            ditemukan = true;
+            std::cout << "Berhasil Menghapus Nama\n";
+            std::getline(file, line);
+        } else {
+            file2 << line << std::endl;
+        }
+    }
+
+    if(!ditemukan) {
+        std::cout << "nama Tidak Ditemukan\n";
+        return;
+    }
+    file.close();
+    file2.close();
+    int hasil = std::remove(fileName.c_str());
+    if(hasil == 0) {
+        std::ofstream file3 (fileName);
+        if(!file3.is_open()) {
+            std::cout << "Filr Gagal Dibuat";
             return;
         }
+
+        std::ifstream file4(fileTemp);
+        if(!file4.is_open()) {
+            std::cout << "File Temp Tidak Dapat Dibuka\n";
+            return;
+        }
+
+        while(std::getline(file4, line)) {
+            file3 << line << std::endl;
+        }
+
+        file3.close();
+        file4.close();
+        int hasil2 = std::remove(fileTemp.c_str());
+        if(hasil2 == 0 ) {
+            std::cout << "File Temp Berhasil Dihapus\n";    
+        } else {
+            std::cout << "Nama Gagal Diubah Karena File Gagal Dihapus";
+            return;
+        }
+    } else {
+        std::cout << "File gagal Dihapus!";
+    }
+
+}
+
+void hapusFile(const std::string fileName){
+    int file = std::remove(fileName.c_str());
+    if(file == 0 ){
+        std::ofstream fileBaru(fileName);
+        if(!fileBaru.is_open()){
+            std::cout << "File Baru Gagal Dibuat";
+        }
+        fileBaru.close();
+        std::cout << "Berhasil Menghapus File \n";
+        return;
     }else{
         std::cout << "Gagal Menghapus File\n";
         return;
     }
-
-    std::ofstream file3(fileName);
-    if(!file3.is_open()){
-        std::cout << "File 3 Gagal Dibuat\n";
-        return;
-    }
-    std::ifstream file4("temp.txt");
-    if(!file4.is_open()){
-        std::cout << "File 4 Gagal Dibuka\n";
-        return;
-    }
-
-    std::cout << "Masukan Nama Pegawai Yang Akan Di Edit : ";
-    std::getline(std::cin , cariNama);
-    
-    bool ditemukan = false;
-    while(std::getline(file4,line)){
-        if(line.find(cariNama) != std::string::npos){
-
-            ditemukan = true;
-
-            std::cout << "Nama Pegawai Ditemukan\n";
-            std::cout << line << std::endl;
-            std::string line2;
-            std::getline(file4,line2);
-            std::cout << line2 << std::endl;
-            std::cout << "\n===========================\n";
-            
-            std::cout << "Edit Nama Pegawai : ";
-            std::getline(std::cin, newName);
-            std::cout << "Edit Gaji Pegawai : ";
-            std::getline(std::cin, newGaji);
-
-            file3 << "Nama : " << newName << "\n" << "Gaji : " << newGaji << std::endl;
-        }else{
-            file3 << line << std::endl;
-        }std::cout << std::endl;
-
-    }
-    if(!ditemukan){
-        std::cout << "Nama Pegawai Tidak Ditemukan\n";
-        return;
-    }
-
-    file3.close();
-    file4.close();
-
 }
 
-int main(){
+int main() {
     int pilih;
-    const std::string fileName = "dataPegawai.txt";
-    const std::string fileTemp = "temp.txt";
-
-    std::cout << "======================================\n";
-    std::cout << "SELAMAT DATANG DI APLIKAI DATA PEGAWAI\n";
-    std::cout << "======================================\n";
-    std::cout << std::endl;
-
-    do{
-        
-        std::cout << "1] Tampilkan Data Pegawai\n";
+    std::string line;
+    const std::string fileName = "DataPegawai.txt";
+    const std::string fileTemp ="temp.txt";
+    std::cout << "=================================\n";
+    std::cout << "SELAMAT ATANG DI APLIKASI PEGAWAI\n";
+    std::cout << "=================================\n";
+    do {
+        std::cout <<std::endl;
+        std::cout << "1] Tampilkan Seluruh Data Pegawai\n";
         std::cout << "2] Tambah Data Pegawai\n";
-        std::cout << "3] Cari Data Pegawai Berdasarkan Nama\n";
+        std::cout << "3] Cari Pegawai Berdasrkan Nama\n";
         std::cout << "4] Edit Data Pegawai\n";
-        std::cout << "5] Hapus  Data Pegawai\n";
-        std::cout << "6] Opsi Lainnya\n";
+        std::cout << "5] Hapus data Pegawai\n";
+        std::cout << "6] Hapus Seluruh Isi File\n";
+
         std::cout << std::endl;
         std::cout << "Pilih Nomor : ";
         std::cin >> pilih;
         std::cin.ignore();
 
-        if(pilih == 1){
-            printData(fileName);
-        }else if(pilih == 2){
+        if (pilih == 1) {
+            printDataPegawai(fileName);
+        } else if(pilih == 2) {
             tambahDataPegawai(fileName);
-        }else if(pilih == 3){
-            cariDataPegawai(fileName);
-        }else if(pilih == 4){
-            editDataPegawai(fileName,fileTemp);
-        }else{
-            return 0;
+        } else if(pilih == 3) {
+            cariNamaPegawai(fileName);
+        } else if(pilih == 4) {
+            editDataPegawai(fileName, fileTemp);
+        } else if(pilih == 5) {
+            hapusDataPegawai(fileName, fileTemp);
+        }else if(pilih == 6){
+            hapusFile(fileName);
         }
-    
-    }while(true);
-    
+    } while(true);
+    return 0;
 }
